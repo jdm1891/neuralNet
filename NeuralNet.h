@@ -6,16 +6,18 @@
 class NeuralNet
 {
 public:
+	friend class Genetic;
+
 	typedef std::vector<Neuron> Layer;
 
 	NeuralNet(const std::vector<unsigned int> & topology);
 
 	void setInputs(const std::vector<double> & inputs);
-	static NeuralNet breed(NeuralNet &a, NeuralNet &b);
+	
 
 	std::vector<double> getOutput();
 	~NeuralNet();
-private:
+protected:
 	std::vector<Layer> _layers;
 	std::vector<unsigned int> _topology;
 };

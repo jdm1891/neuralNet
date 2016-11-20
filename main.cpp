@@ -2,82 +2,59 @@
 #include "NeuralNet.h"
 #include <stdlib.h>
 #include <algorithm>
+#include "Genetic.h"
 
-#define GEN_SIZE 25
-#define GEN_AMOUNT 3000
-#define ELITE 1
+#define GEN_SIZE 100
+#define GEN_AMOUNT 10000
+#define ELITE 3
 int main()
 {
-	struct fitid
+	struct v
 	{
-		std::size_t id;
-		double fitness;
 		NeuralNet net;
-
-		fitid(std::size_t k, double s, NeuralNet n) : id(k), fitness(s), net(n) {}
-
-		bool operator < (const fitid& str) const
+		double eff;
+		v(NeuralNet a) : net(a) {}
+		bool operator < (const v& a) const
 		{
-			return (fitness < str.fitness);
+			return (eff < a.eff);
 		}
 	};
-
-	std::vector<NeuralNet> a;
-	for (int m = 0; m < GEN_AMOUNT; m++)
-	{
-		std::vector <fitid> b;
-		for (std::size_t i = 0; i < GEN_SIZE; ++i)
-		{
-			double rand_a = rand() % 20;
-			double rand_b = rand() % 20;
-			a.push_back(NeuralNet({ 2,2,1 }));
-			a.back().setInputs({ rand_a, rand_b });
-			double fitness = abs(rand_b + rand_a - a.back().getOutput().back());
-			b.push_back(fitid(i, fitness, a.back()));
-		}
-		std::sort(b.begin(), b.end());
-		std::vector<fitid> next;
-		std::vector<NeuralNet> nextgen;
-		for (const auto & item : b)
-		{
-			if (item.fitness < ELITE)
-			{
-				next.push_back(item);
-				nextgen.push_back(item.net);
-			}
-		}
-		if (next.size() == 0)
-		{
-			for (const auto & item : b)
-			{
-				if (item.fitness < ELITE*10)
-				{
-					next.push_back(item);
-					nextgen.push_back(item.net);
-				}
-			}
-		}
-		int nextSize = next.size();
-		for (std::size_t i = nextSize; i < GEN_SIZE; ++i)
-		{
-			NeuralNet & randoma = next[rand() % next.size()].net;
-			NeuralNet & randomb = next[rand() % next.size()].net;
-			nextgen.push_back(NeuralNet::breed(randoma, randomb));
-		}
-		a.clear();
-		a = nextgen;
-		if (m % 20 == 0)
-		{
-			std::cout << "Generation " << m << " has finished" << std::endl;
-		}
-	}
+	std::vector<v> a;
 	for (int i = 0; i < 10; i++)
 	{
-		double rand_a = rand() % 20;
-		double rand_b = rand() % 20;
-		a.front().setInputs({ rand_a, rand_b });
-		std::cout << "I think that " << rand_a << " + " << rand_b << " = " << round(a.front().getOutput()[0]) << std::endl;
+		int random_a = rand() % 10;
+		int random_b = rand() % 10;
+		a.push_back(NeuralNet({ 2,1 }));
+		a.back().net.setInputs({ (double)random_a, (double)random_b });
+		a.back().eff = abs(random_a + random_b - a.back().net.getOutput().back());
 	}
+	for (int i = 0; i < 1000; i++)
+	{
+		int random_a = rand() % 10;
+		int random_b = rand() % 10;
+		for (int i = 1; i < a.size(); i++)
+		{
+			int random_a = rand() % 10;
+			int random_b = rand() % 10;
+			a[i-1].net.setInputs({ (double)random_a, (double)random_b });
+			a[i-1].eff = abs(random_a + random_b - a[i-1].net.getOutput().back());
+		}		
+		std::sort(a.begin(), a.end());
+		a.pop_back();
+		a.push_back(Genetic::breed(a[0].net, a[1].net));
+		for (int i = 2; i < a.size(); i++)
+		{
+			a[i].net = Genetic::mutate(a[i].net, 0.001f);
+		}
+		double mosteff = a.front().eff;
+		std::cout << mosteff << std::endl;
+	}
+	std::cout << "Enter numbers to add:" << std::endl;
+	double numa;
+	double numb;
+	std::cin >> numa >> numb;
+	a.front().net.setInputs({ numa, numb });
+	std::cout << a.front().net.getOutput()[0] << std::endl;
 	system("pause");
 	return 0;
 }
