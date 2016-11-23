@@ -4,6 +4,8 @@
 #include "NeuralNet.h"
 #include "Random.h"
 
+
+
 NeuralNet Genetic::breed(NeuralNet & a, NeuralNet & b)
 {
 	//Mismatched topologies not allowed!
@@ -50,7 +52,7 @@ NeuralNet Genetic::breed(NeuralNet & a, NeuralNet & b)
 	return child;
 }
 
-NeuralNet Genetic::mutate(NeuralNet a, double mutateRate)
+NeuralNet Genetic::mutate(NeuralNet a)
 {
 	std::vector<double> weights;
 	for (std::size_t i = 1; i < a._layers.size(); ++i)
@@ -59,9 +61,9 @@ NeuralNet Genetic::mutate(NeuralNet a, double mutateRate)
 		{
 			for (std::size_t k = 0; k < a._layers[i - 1].size(); ++k)
 			{
-				if (rand() % (int)(1 / mutateRate) == 0)
+				if (rand() % (int)(1 / MUTATE_RATE) == 0)
 				{
-					weights.push_back(Random::generate(a._layers[i][j].getWeights()[k]/2,a._layers[i][j].getWeights()[k] * 2));
+					weights.push_back(Random::generate(a._layers[i][j].getWeights()[k]-MUTATE_SEVERITY,a._layers[i][j].getWeights()[k] + MUTATE_SEVERITY));
 				}
 				else
 				{

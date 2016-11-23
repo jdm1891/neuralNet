@@ -3,58 +3,52 @@
 #include <stdlib.h>
 #include <algorithm>
 #include "Genetic.h"
+#include "Random.h"
 
-#define GEN_SIZE 100
-#define GEN_AMOUNT 10000
-#define ELITE 3
 int main()
 {
-	struct v
+	std::vector<Genetic::genetic_nn> vec;
+
+	for (int creature = 0; creature < GEN_SIZE; ++creature)
 	{
-		NeuralNet net;
-		double eff;
-		v(NeuralNet a) : net(a) {}
-		bool operator < (const v& a) const
-		{
-			return (eff < a.eff);
-		}
-	};
-	std::vector<v> a;
-	for (int i = 0; i < 10; i++)
-	{
-		int random_a = rand() % 10;
-		int random_b = rand() % 10;
-		a.push_back(NeuralNet({ 2,1 }));
-		a.back().net.setInputs({ (double)random_a, (double)random_b });
-		a.back().eff = abs(random_a + random_b - a.back().net.getOutput().back());
+		vec.push_back(Genetic::genetic_nn(NeuralNet({ 2,1 })));
 	}
-	for (int i = 0; i < 1000; i++)
+
+	for (int generation = 0; generation < GEN_AMOUNT; ++generation)
 	{
-		int random_a = rand() % 10;
-		int random_b = rand() % 10;
-		for (int i = 1; i < a.size(); i++)
+		for (int creature = 0; creature < GEN_SIZE; ++creature)
 		{
-			int random_a = rand() % 10;
-			int random_b = rand() % 10;
-			a[i-1].net.setInputs({ (double)random_a, (double)random_b });
-			a[i-1].eff = abs(random_a + random_b - a[i-1].net.getOutput().back());
-		}		
-		std::sort(a.begin(), a.end());
-		a.pop_back();
-		a.push_back(Genetic::breed(a[0].net, a[1].net));
-		for (int i = 2; i < a.size(); i++)
-		{
-			a[i].net = Genetic::mutate(a[i].net, 0.001f);
+			std::cout << creature << " " << vec.size() << std::endl;
+			double first_random = Random::generate_i(1, 100);
+			double second_random = Random::generate_i(1, 100);
+			vec[creature].net.setInputs({ first_random, second_random });
+			double output = vec[creature].net.getOutput()[0];
+			std::cout << output << std::endl;
+			vec[creature].eff = abs(0 - (first_random + second_random));
 		}
-		double mosteff = a.front().eff;
-		std::cout << mosteff << std::endl;
+
+		std::sort(vec.begin(), vec.end());
+
+		for (int breed = 0; breed < int(GEN_SIZE / 10); ++breed)
+		{
+			vec.insert(vec.begin(), Genetic::genetic_nn(Genetic::breed(vec[breed].net, vec[breed + 1].net)));
+		}
+
+		for (int kill = vec.size(); kill > GEN_SIZE; --kill)
+		{
+			vec.pop_back();
+		}
+		
+		for (int mutate = 0; mutate < vec.size(); ++mutate)
+		{
+			Genetic::mutate(vec[mutate].net);
+		}
+		if (generation % 50 == 0)
+		{
+			std::cout << "On generation " << generation << " of " << GEN_AMOUNT << std::endl;
+		}
+		std::cout << vec.size() << std::endl;
 	}
-	std::cout << "Enter numbers to add:" << std::endl;
-	double numa;
-	double numb;
-	std::cin >> numa >> numb;
-	a.front().net.setInputs({ numa, numb });
-	std::cout << a.front().net.getOutput()[0] << std::endl;
+	std::cout << "Best adding machine's efficiency: " << vec.front().eff << std::endl;
 	system("pause");
-	return 0;
 }

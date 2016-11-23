@@ -19,6 +19,7 @@ public:
 	~NeuralNet();
 protected:
 	std::vector<Layer> _layers;
+	std::vector<double> _inputs;
 	std::vector<unsigned int> _topology;
 };
 

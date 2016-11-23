@@ -2,6 +2,7 @@
 #include "NeuralNet.h"
 #include <assert.h>
 #include <iostream>
+#include "Defines.h"
 
 Neuron::Neuron()
 {
@@ -9,6 +10,14 @@ Neuron::Neuron()
 
 void Neuron::setWeights(std::vector<double> weights)
 {
+	if (LOG)
+	{
+		for (const auto & a : weights)
+		{
+			std::cout << a << " ";
+		}
+		std::cout << std::endl;
+	}
 	_weights = weights;
 }
 

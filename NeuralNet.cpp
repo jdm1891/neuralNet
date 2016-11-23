@@ -3,6 +3,7 @@
 #include <functional>
 #include "Random.h"
 #include <assert.h>
+#include "Defines.h"
 
 
 NeuralNet::NeuralNet(const std::vector<unsigned int>& topology) : _topology(topology)
@@ -28,8 +29,21 @@ NeuralNet::NeuralNet(const std::vector<unsigned int>& topology) : _topology(topo
 		//Populate that layer with empty neurons
 		for (std::size_t j = 0; j < topology[i]; ++j)
 		{
+			if (LOG)
+			{
+				std::cout << "Setting weights for neuron " << j + 1 << " of layer " << i + 1 << ": ";
+			}
 			Neuron newNeuron;
-			newNeuron.setWeights(weights);
+			if (i == 0)
+			{
+				//Set the weights of the input layer to 1!;
+				std::fill(weights.begin(), weights.end(), 1);
+				newNeuron.setWeights(weights);
+			}
+			else
+			{
+				newNeuron.setWeights(weights);
+			}
 			_layers[i].push_back(newNeuron);
 		}
 
@@ -46,7 +60,12 @@ void NeuralNet::setInputs(const std::vector<double> & inputs)
 	assert(inputs.size()==_topology[0]);
 	for (unsigned int i = 0; i < _layers[0].size(); ++i)
 	{
-		_layers[0][i].setInputs({ inputs });
+		
+		_layers[0][i].setInputs({ inputs[i] });
+		if (LOG)
+		{
+			std::cout << "Neuron " << i+1 << " accepting input: " << inputs[i] << std::endl;
+		}
 	}
 }
 
@@ -59,7 +78,18 @@ std::vector<double> NeuralNet::getOutput()
 			std::vector<double> inputs;
 			for (std::size_t j = 0; j < _layers[i-1].size(); ++j)
 			{
-				inputs.push_back(_layers[i - 1][j].output());
+				//if (i = 1)
+				//{
+				//	inputs.push_back(_layers[i-1][j].)
+				//}
+				//else
+				//{
+					inputs.push_back(_layers[i - 1][j].output());
+				//}
+				if (LOG)
+				{
+					std::cout << "Neuron " << j + 1 << " of layer " << i << " is outputting " << inputs.back() << std::endl;
+				}
 			}
 			_layers[i][j].setInputs(inputs);
 			inputs.clear();
