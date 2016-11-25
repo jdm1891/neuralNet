@@ -32,12 +32,23 @@ std::vector<double> Neuron::getWeights()
 	return _weights;
 }
 
-double Neuron::output()
+double Neuron::output(bool isFirstLayer)
 {
 	double output = 0;
-	for (std::size_t i = 0; i < _weights.size(); ++i)
+	if (!isFirstLayer)
 	{
-		output += _weights[i] * _inputs[i];
+		for (std::size_t i = 0; i < _weights.size(); ++i)
+		{
+			output += _weights[i] * _inputs[i];
+		}
+	}
+	else
+	{
+		for (std::size_t i = 0; i < _weights.size(); ++i)
+		{
+			//Only one input per neuron on the first layer
+			output += _weights[i] * _inputs[0];
+		}
 	}
 	return output;
 }

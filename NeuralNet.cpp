@@ -60,7 +60,6 @@ void NeuralNet::setInputs(const std::vector<double> & inputs)
 	assert(inputs.size()==_topology[0]);
 	for (unsigned int i = 0; i < _layers[0].size(); ++i)
 	{
-		
 		_layers[0][i].setInputs({ inputs[i] });
 		if (LOG)
 		{
@@ -78,14 +77,16 @@ std::vector<double> NeuralNet::getOutput()
 			std::vector<double> inputs;
 			for (std::size_t j = 0; j < _layers[i-1].size(); ++j)
 			{
-				//if (i = 1)
-				//{
-				//	inputs.push_back(_layers[i-1][j].)
-				//}
-				//else
-				//{
+				if (i = 1)
+				{
+					//Different calculating mechanism for the first layer
+					inputs.push_back(_layers[i - 1][j].output(true));
+				}
+				else
+				{
 					inputs.push_back(_layers[i - 1][j].output());
-				//}
+				}
+				
 				if (LOG)
 				{
 					std::cout << "Neuron " << j + 1 << " of layer " << i << " is outputting " << inputs.back() << std::endl;
@@ -100,6 +101,7 @@ std::vector<double> NeuralNet::getOutput()
 	{
 		outputs.push_back(_layers.back()[i].output());
 	}
+	std::cout << outputs.size() << std::endl;
 	return outputs;
 
 }

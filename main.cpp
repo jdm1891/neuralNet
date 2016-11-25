@@ -18,7 +18,6 @@ int main()
 	{
 		for (int creature = 0; creature < GEN_SIZE; ++creature)
 		{
-			std::cout << creature << " " << vec.size() << std::endl;
 			double first_random = Random::generate_i(1, 100);
 			double second_random = Random::generate_i(1, 100);
 			vec[creature].net.setInputs({ first_random, second_random });
